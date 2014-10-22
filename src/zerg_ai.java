@@ -1,7 +1,7 @@
 import bwapi.*;
 import bwta.*;
 
-public class TestBot1{
+public class zerg_ai{
 
     private Mirror mirror = new Mirror();
 
@@ -30,17 +30,19 @@ public class TestBot1{
                 
             }
 
+            boolean needOverlord = false;
+            int supplyDiff;
+            
             @Override
             public void onFrame() {
-                game.setTextSize(10);
+                game.setTextSize(5);
                 game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+                game.drawTextScreen(50, 10, Boolean.toString(needOverlord));
 
                 StringBuilder units = new StringBuilder("My units:\n");
                 
-                int supplyDiff = self.supplyTotal() - self.supplyUsed();
-          
-                boolean needOverlord = false;
-                
+                supplyDiff = self.supplyTotal() - self.supplyUsed();
+               
                 if (supplyDiff <= 1) {
                 	needOverlord = true;
                 }
@@ -57,6 +59,7 @@ public class TestBot1{
                     //if necessary, train an overlord
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 100 && needOverlord) {
                         myUnit.train(UnitType.Zerg_Overlord);
+                        needOverlord = false;
                     }
 
                     //if it's a drone and it's idle, send it to the closest mineral patch
@@ -88,6 +91,6 @@ public class TestBot1{
     }
 
     public static void main(String... args) {
-        new TestBot1().run();
+        new zerg_ai().run();
     }
 }
