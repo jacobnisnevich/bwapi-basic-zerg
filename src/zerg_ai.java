@@ -27,12 +27,13 @@ public class zerg_ai{
                 BWTA.readMap();
                 BWTA.analyze();
                 System.out.println("Map data ready");
-                
+
             }
 
             boolean needOverlord = false;
             int supplyDiff;
-            
+            bool builtSpawningPool = false;
+
             @Override
             public void onFrame() {
                 game.setTextSize(5);
@@ -40,26 +41,36 @@ public class zerg_ai{
                 game.drawTextScreen(50, 10, Boolean.toString(needOverlord));
 
                 StringBuilder units = new StringBuilder("My units:\n");
-                
+
                 supplyDiff = self.supplyTotal() - self.supplyUsed();
-               
+
                 if (supplyDiff <= 1) {
-                	needOverlord = true;
+                    needOverlord = true;
+                }
+                
+                //step 1: set drones to mine (done below)
+                //step 2: build spawning pool
+                if ((self.minerals() >= 200) && !builtSpawningPool)
+                {
+                    builtSpawningPool = true;
+                    //build spawning pool here
+                    //TilePosition targetLocation = get_pool_position();
+                    //build_spawning_pool(targetLocation)
                 }
 
                 //iterate through my units
                 for (Unit myUnit : self.getUnits()) {
                     units.append(myUnit.getType()).append(" ").append(myUnit.getTilePosition()).append("\n");
 
-                    //if there's enough minerals, train a drone
+                    /*//if there's enough minerals, train a drone
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 50 && !needOverlord) {
                         myUnit.train(UnitType.Zerg_Drone);
-                    }
-                    
+                    }*/
+
                     //if necessary, train an overlord
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 100 && needOverlord) {
-                        myUnit.train(UnitType.Zerg_Overlord);
                         needOverlord = false;
+                        myUnit.train(UnitType.Zerg_Overlord);                       
                     }
 
                     //if it's a drone and it's idle, send it to the closest mineral patch
@@ -67,13 +78,7 @@ public class zerg_ai{
                         Unit closestMineral = null;
 
                         //find the closest mineral
-                        for (Unit neutralUnit : game.neutral().getUnits()) {
-                            if (neutralUnit.getType().isMineralField()) {
-                                if (closestMineral == null || myUnit.getDistance(neutralUnit) < myUnit.getDistance(closestMineral)) {
-                                    closestMineral = neutralUnit;
-                                }
-                            }
-                        }
+                        closestMineral = getClosestMineral(myUnit);
 
                         //if a mineral patch was found, send the drone to gather it
                         if (closestMineral != null) {
@@ -84,6 +89,24 @@ public class zerg_ai{
 
                 //draw my units on screen
                 game.drawTextScreen(10, 25, units.toString());
+            }
+
+            Unit getClosestMineral(Unit target)
+            {
+                for (Unit neutralUnit : game.neutral().getUnits()) {
+                    if (neutralUnit.getType().isMineralField()) {
+                        if (closestMineral == null || target.getDistance(neutralUnit) < target.getDistance(closestMineral)) {
+                            closestMineral = neutralUnit;
+                        }
+                    }
+                }
+                
+                return closestMineral;
+            }
+            
+            TileLocation getPoolPosition()
+            {
+                
             }
         });
 
