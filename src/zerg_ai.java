@@ -33,12 +33,13 @@ public class zerg_ai{
             boolean needOverlord = false;
             int supplyDiff;
             boolean builtSpawningPool = false;
+            Unit hatchery = null;
+            TilePosition poolPosition = null;
 
             @Override
             public void onFrame() {
                 game.setTextSize(5);
                 game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-                game.drawTextScreen(50, 10, Boolean.toString(needOverlord));
 
                 StringBuilder units = new StringBuilder("My units:\n");
 
@@ -49,13 +50,10 @@ public class zerg_ai{
                 }
                 
                 //step 1: set drones to mine (done below)
-                //step 2: build spawning pool
-                if ((self.minerals() >= 200) && !builtSpawningPool)
-                {
-                    builtSpawningPool = true;
-                    //build spawning pool here
-                    //TilePosition targetLocation = get_pool_position();
-                    //build_spawning_pool(targetLocation)
+               
+                //check if hatchery is not null, if not null set poolPosition
+                if (hatchery != null) {
+                	poolPosition = getPoolPosition(hatchery, getClosestMineral(hatchery));
                 }
 
                 //iterate through my units
@@ -71,6 +69,17 @@ public class zerg_ai{
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 100 && needOverlord) {
                         needOverlord = false;
                         myUnit.train(UnitType.Zerg_Overlord);                       
+                    }
+                    
+                    //set hatchery
+                    if (myUnit.getType() == UnitType.Zerg_Hatchery) {
+                        hatchery = myUnit;                     
+                    }
+                    
+                    //step 2: build spawning pool
+                    if (myUnit.getType().isWorker() && !myUnit.isCarryingMinerals() && self.minerals() >= 200 && !builtSpawningPool && poolPosition != null) {
+                        builtSpawningPool = true;
+                        myUnit.build(poolPosition, UnitType.Zerg_Spawning_Pool);
                     }
 
                     //if it's a drone and it's idle, send it to the closest mineral patch
@@ -109,6 +118,15 @@ public class zerg_ai{
             TilePosition getPoolPosition(Unit hatchery, Unit mineral)
             {
             	int poolX = 0, poolY = 0;
+            	
+            	TilePosition mineralPosition = mineral.getTilePosition();
+            	int mineralX = mineralPosition.getX(), mineralY = mineralPosition.getY();
+            	
+            	TilePosition hatcheryPosition = hatchery.getTilePosition();
+            	int hatcheryX = hatcheryPosition.getX(), hatcheryY = hatcheryPosition.getY();
+            	
+            	poolX = hatcheryX - (mineralX - hatcheryX);
+            	poolY = hatcheryY - (mineralY - hatcheryY);
             	
                 TilePosition poolPosition = new TilePosition(poolX, poolY);
                 return poolPosition;
