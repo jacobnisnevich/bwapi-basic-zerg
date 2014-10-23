@@ -32,7 +32,7 @@ public class zerg_ai{
 
             boolean needOverlord = false;
             int supplyDiff;
-            bool builtSpawningPool = false;
+            boolean builtSpawningPool = false;
 
             @Override
             public void onFrame() {
@@ -93,6 +93,8 @@ public class zerg_ai{
 
             Unit getClosestMineral(Unit target)
             {
+            	Unit closestMineral = null;
+            	
                 for (Unit neutralUnit : game.neutral().getUnits()) {
                     if (neutralUnit.getType().isMineralField()) {
                         if (closestMineral == null || target.getDistance(neutralUnit) < target.getDistance(closestMineral)) {
@@ -104,9 +106,12 @@ public class zerg_ai{
                 return closestMineral;
             }
             
-            TileLocation getPoolPosition()
+            TilePosition getPoolPosition(Unit hatchery, Unit mineral)
             {
-                
+            	int poolX = 0, poolY = 0;
+            	
+                TilePosition poolPosition = new TilePosition(poolX, poolY);
+                return poolPosition;
             }
         });
 
