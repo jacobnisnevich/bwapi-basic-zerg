@@ -60,6 +60,11 @@ public class zerg_ai{
                 for (Unit myUnit : self.getUnits()) {
                     units.append(myUnit.getType()).append(" ").append(myUnit.getTilePosition()).append("\n");
 
+                    if (myUnit.getType() == UnitType.Zerg_Zergling) {
+            			myUnit.attack(findEnemyBase());
+            			game.drawTextScreen(10, 45, findEnemyBase().toString());
+                    }
+                    
                     //if there's enough minerals, make zerglings
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 50 && !needOverlord) {
                         myUnit.train(UnitType.Zerg_Zergling);
@@ -97,9 +102,19 @@ public class zerg_ai{
                 }
 
                 //draw my units on screen
-                game.drawTextScreen(10, 25, units.toString());
+                game.drawTextScreen(10, 25, self.getStartLocation().toString());
             }
 
+            Position findEnemyBase() {
+            	for (BaseLocation location : BWTA.getBaseLocations()) {
+            		if (location.isStartLocation() && location != BWTA.getStartLocation(self)) {
+            			return location.getPosition();
+            		}
+            	}
+            	
+            	return null;
+            }
+            
             Unit getClosestMineral(Unit target)
             {
             	Unit closestMineral = null;
