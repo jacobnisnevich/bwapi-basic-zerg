@@ -60,10 +60,10 @@ public class zerg_ai{
                 for (Unit myUnit : self.getUnits()) {
                     units.append(myUnit.getType()).append(" ").append(myUnit.getTilePosition()).append("\n");
 
-                    /*//if there's enough minerals, train a drone
+                    //if there's enough minerals, make zerglings
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 50 && !needOverlord) {
-                        myUnit.train(UnitType.Zerg_Drone);
-                    }*/
+                        myUnit.train(UnitType.Zerg_Zergling);
+                    }
 
                     //if necessary, train an overlord
                     if (myUnit.getType() == UnitType.Zerg_Larva && self.minerals() >= 100 && needOverlord) {
